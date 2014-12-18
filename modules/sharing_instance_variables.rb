@@ -2,15 +2,21 @@
 ## modules.
 gem 'activesupport'
 require 'active_support/concern'
+require 'forwardable'
+require 'ostruct'
 
 module Mamal
 	extend ActiveSupport::Concern
+	extend Forwardable
+
+	def_delegator :values, :has_many
 
 	module ClassMethods
 		attr_accessor :values
 
 		def has_many hsh={}
-			@values = hsh
+			@values = OpenStruct.new
+			@values.has_many = hsh
 		end
 	end
 
@@ -28,7 +34,7 @@ class Dog
 	end
 
 	def body
-		values.to_a.join " "
+		has_many.to_a.join " "
 	end
 end
 
